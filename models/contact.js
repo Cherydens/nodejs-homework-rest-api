@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 const { handleMongooseError } = require('../helpers');
+const { regexpList } = require('../variables');
 
 const contactSchema = new Schema(
   {
@@ -10,16 +11,23 @@ const contactSchema = new Schema(
     },
     email: {
       type: String,
+      match: [regexpList.email, 'Email must be valid'],
     },
     phone: {
       type: String,
+      match: [regexpList.phone, 'Phone must be valid'],
     },
     favorite: {
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: [true, 'Set owner for contact'],
+    },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 contactSchema.post('save', handleMongooseError);
