@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const app = require('./app');
+const { createFolderIsNotExist } = require('./utils');
 
 // Retrieve environment variables
 const { DB_HOST, PORT = 3000 } = process.env;
@@ -13,7 +14,8 @@ mongoose
   .connect(DB_HOST)
   .then(() => {
     console.log('Database connection successful');
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
+      await createFolderIsNotExist((process.env.TEMP_DIR = 'tmp'));
       console.log(`Server running. Use our API on port: ${PORT}`);
     });
   })

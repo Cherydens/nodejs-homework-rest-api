@@ -2,9 +2,13 @@
 
 const express = require('express');
 
-const { validateBody, authenticate, upload } = require('../../middlewares');
+const {
+  validateBody,
+  authenticate,
+  uploadImage,
+} = require('../../middlewares');
 const controllers = require('../../controllers/users');
-const schemas = require('../../utils/validation/userValidationSchemas');
+const { userValidationSchemas } = require('../../utils');
 
 // An Express router object is created:
 const router = express.Router();
@@ -14,14 +18,14 @@ const router = express.Router();
 // Route for user registration (POST /register):
 router.post(
   '/register',
-  validateBody(schemas.registerUserSchema),
+  validateBody(userValidationSchemas.registerUserSchema),
   controllers.registerUser
 );
 
 // Route for user login (POST /login):
 router.post(
   '/login',
-  validateBody(schemas.loginUserSchema),
+  validateBody(userValidationSchemas.loginUserSchema),
   controllers.loginUser
 );
 
@@ -35,18 +39,19 @@ router.get('/current', authenticate, controllers.getCurrentUser);
 router.patch(
   '/',
   authenticate,
-  validateBody(schemas.updateSubscriptionUserSchema),
+  validateBody(userValidationSchemas.updateSubscriptionUserSchema),
   controllers.updateSubscriptionUser
 );
 
+// Route for updating the user's avatar (PATCH /):
 router.patch(
   '/avatars',
   authenticate,
-  upload.single('avatar'),
-  controllers.updateUsersAvatar
+  uploadImage.single('avatar'),
+  controllers.updateUserAvatar
 );
 
 //  The router object is exported for use in other parts of the program:
 module.exports = router;
 
-// This code creates an API for user registration, login, logout, retrieving the current user's information, and updating the user's subscription status. Middlewares like authenticate are used for user authentication, and validation schemas ensure that the request data is correct. Controllers handle the logic for these user-related operations.
+// This code creates an API for user registration, login, logout, retrieving the current user's information, updating the user's subscription status and updating the user's avatar. Middlewares like authenticate are used for user authentication, and validation schemas ensure that the request data is correct. Controllers handle the logic for these user-related operations.

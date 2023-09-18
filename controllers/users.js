@@ -6,11 +6,9 @@ const fs = require('fs/promises');
 const Jimp = require('jimp');
 
 const User = require('../models/user');
-const { HttpError, controllerWrapper } = require('../helpers');
+const { HttpError, controllerWrapper } = require('../utils');
 
 const { SECRET_KEY } = process.env;
-
-const avatarsDir = path.join(__dirname, '..', 'public', 'avatars');
 
 /**
  * Registers a new user with the provided email and password.
@@ -31,6 +29,7 @@ const registerUser = controllerWrapper(async (req, res) => {
   // Hash the provided password
   const hashPassword = await bcrypt.hash(password, 10);
 
+  // Create random avatar
   const avatarURL = gravatar.url(email);
 
   // Create a new user with the hashed password
@@ -45,6 +44,7 @@ const registerUser = controllerWrapper(async (req, res) => {
     user: {
       email: newUser.email,
       subscription: newUser.subscription,
+      avatarURL: newUser.avatarURL,
     },
   });
 });
@@ -93,6 +93,7 @@ const loginUser = controllerWrapper(async (req, res) => {
     user: {
       email: user.email,
       subscription: user.subscription,
+      avatarURL: user.avatarURL,
     },
   });
 });
@@ -150,26 +151,32 @@ const updateSubscriptionUser = controllerWrapper(async (req, res) => {
   res.status(200).json(result);
 });
 
-const updateUsersAvatar = controllerWrapper(async (req, res) => {
+/**
+ * Updates the avatar of the currently authenticated user.
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response containing the updated user avatarURL
+ */
+const updateUserAvatar = controllerWrapper(async (req, res) => {
   const { _id } = req.user;
   const { path: tempUpload, originalname } = req.file;
 
-  await Jimp.read(tempUpload)
-    .then((image) => {
-      return image
-        .resize(250, 250) // resize
-        .write(tempUpload); // save
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+  const image = await Jimp.read(tempUpload);
+  await image
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE)
+    .writeAsync(tempUpload);
 
   const filename = `${_id}_${originalname}`;
+  const avatarsDir = path.join(__dirname, '..', 'public', 'avatars');
   const resultUpload = path.join(avatarsDir, filename);
 
   await fs.rename(tempUpload, resultUpload);
   const avatarURL = path.join('avatars', filename);
   await User.findByIdAndUpdate(_id, { avatarURL });
+
+  // Respond with the updated user avatarURL
   res.json({
     avatarURL,
   });
@@ -181,7 +188,7 @@ module.exports = {
   logoutUser,
   getCurrentUser,
   updateSubscriptionUser,
-  updateUsersAvatar,
+  updateUserAvatar,
 };
 
 // This code defines a set of controller functions for user registration, login, logout, retrieving the current user's information, and updating the user's subscription status. These functions are wrapped in error handling logic, and they interact with the User model and use JWT for authentication. In case of errors, appropriate HTTP status codes and error messages are returned in the responses.

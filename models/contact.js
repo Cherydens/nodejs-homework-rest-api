@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const { handleMongooseError } = require('../helpers');
+const { handleMongooseError } = require('../utils');
 const { regexpList } = require('../variables');
 
 /**

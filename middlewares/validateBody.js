@@ -1,4 +1,4 @@
-const { HttpError } = require('../helpers');
+const { HttpError } = require('../utils');
 
 /**
  * Middleware function to validate the request body using a schema.

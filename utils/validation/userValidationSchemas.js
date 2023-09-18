@@ -32,6 +32,7 @@ const updateSubscriptionUserSchema = Joi.object({
   subscription: registerUserSchema.extract('subscription').required(),
 }).messages(validateErrorMessageList);
 
+
 module.exports = {
   registerUserSchema,
   loginUserSchema,

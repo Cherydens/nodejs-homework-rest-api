@@ -1,4 +1,4 @@
-const { httpErrorMessageList } = require('../variables');
+const { httpErrorMessageList } = require('../../variables');
 
 /**
  * Custom HTTP error class that extends the JavaScript Error class.

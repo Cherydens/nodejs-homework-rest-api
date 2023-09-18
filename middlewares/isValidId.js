@@ -1,5 +1,5 @@
 const { isValidObjectId } = require('mongoose');
-const { HttpError } = require('../helpers');
+const { HttpError } = require('../utils');
 
 /**
  * Middleware function to validate if a given ID is a valid MongoDB ObjectId.

@@ -1,5 +1,5 @@
 const Contact = require('../models/contact');
-const { HttpError, controllerWrapper } = require('../helpers');
+const { HttpError, controllerWrapper } = require('../utils');
 
 /**
  * List contacts with optional filtering and pagination.
