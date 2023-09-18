@@ -2,7 +2,7 @@
 
 const express = require('express');
 
-const { validateBody, authenticate } = require('../../middlewares');
+const { validateBody, authenticate, upload } = require('../../middlewares');
 const controllers = require('../../controllers/users');
 const schemas = require('../../utils/validation/userValidationSchemas');
 
@@ -37,6 +37,13 @@ router.patch(
   authenticate,
   validateBody(schemas.updateSubscriptionUserSchema),
   controllers.updateSubscriptionUser
+);
+
+router.patch(
+  '/avatars',
+  authenticate,
+  upload.single('avatar'),
+  controllers.updateUsersAvatar
 );
 
 //  The router object is exported for use in other parts of the program:

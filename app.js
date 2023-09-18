@@ -21,6 +21,8 @@ app.use(cors());
 // Middleware for parsing JSON request bodies
 app.use(express.json());
 
+app.use(express.static('public'));
+
 // Routes for user authentication and contact management
 app.use('/api/users', authRouter);
 app.use('/api/contacts', contactsRouter);

@@ -1,10 +1,16 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
+const path = require('path');
+const fs = require('fs/promises');
+const Jimp = require('jimp');
 
 const User = require('../models/user');
 const { HttpError, controllerWrapper } = require('../helpers');
 
 const { SECRET_KEY } = process.env;
+
+const avatarsDir = path.join(__dirname, '..', 'public', 'avatars');
 
 /**
  * Registers a new user with the provided email and password.
@@ -25,8 +31,14 @@ const registerUser = controllerWrapper(async (req, res) => {
   // Hash the provided password
   const hashPassword = await bcrypt.hash(password, 10);
 
+  const avatarURL = gravatar.url(email);
+
   // Create a new user with the hashed password
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
 
   // Respond with the newly registered user's email and subscription
   res.status(201).json({
@@ -138,12 +150,38 @@ const updateSubscriptionUser = controllerWrapper(async (req, res) => {
   res.status(200).json(result);
 });
 
+const updateUsersAvatar = controllerWrapper(async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+
+  await Jimp.read(tempUpload)
+    .then((image) => {
+      return image
+        .resize(250, 250) // resize
+        .write(tempUpload); // save
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+
+  const filename = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, filename);
+
+  await fs.rename(tempUpload, resultUpload);
+  const avatarURL = path.join('avatars', filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+  res.json({
+    avatarURL,
+  });
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser,
   updateSubscriptionUser,
+  updateUsersAvatar,
 };
 
 // This code defines a set of controller functions for user registration, login, logout, retrieving the current user's information, and updating the user's subscription status. These functions are wrapped in error handling logic, and they interact with the User model and use JWT for authentication. In case of errors, appropriate HTTP status codes and error messages are returned in the responses.
