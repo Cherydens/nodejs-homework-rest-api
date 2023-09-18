@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const path = require('path');
 const fs = require('fs/promises');
-const Jimp = require('jimp');
 
 const User = require('../models/user');
-const { HttpError, controllerWrapper } = require('../utils');
+const { HttpError, controllerWrapper, imageResizer } = require('../utils');
+const { dirNames } = require('../variables');
 
 const { SECRET_KEY } = process.env;
 
@@ -159,21 +159,24 @@ const updateSubscriptionUser = controllerWrapper(async (req, res) => {
  * @returns {Object} JSON response containing the updated user avatarURL
  */
 const updateUserAvatar = controllerWrapper(async (req, res) => {
-  const { _id } = req.user;
+  if (!req.file) {
+    throw new HttpError(400, 'Avatar file is required');
+  }
+
   const { path: tempUpload, originalname } = req.file;
-
-  const image = await Jimp.read(tempUpload);
-  await image
-    .autocrop()
-    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE)
-    .writeAsync(tempUpload);
-
+  const { _id } = req.user;
   const filename = `${_id}_${originalname}`;
-  const avatarsDir = path.join(__dirname, '..', 'public', 'avatars');
-  const resultUpload = path.join(avatarsDir, filename);
+  const resultUpload = path.join(
+    __dirname,
+    '..',
+    dirNames.PUBLIC_DIR,
+    dirNames.AVATARS_DIR,
+    filename
+  );
+  const avatarURL = path.join(dirNames.AVATARS_DIR, filename);
 
+  await imageResizer(tempUpload);
   await fs.rename(tempUpload, resultUpload);
-  const avatarURL = path.join('avatars', filename);
   await User.findByIdAndUpdate(_id, { avatarURL });
 
   // Respond with the updated user avatarURL

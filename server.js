@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
+const path = require('path');
 
 const app = require('./app');
 const { createFolderIsNotExist } = require('./utils');
+const { dirNames } = require('./variables');
+
+const avatarsDir = path.join(dirNames.PUBLIC_DIR, dirNames.AVATARS_DIR);
 
 // Retrieve environment variables
 const { DB_HOST, PORT = 3000 } = process.env;
@@ -15,7 +19,10 @@ mongoose
   .then(() => {
     console.log('Database connection successful');
     app.listen(PORT, async () => {
-      await createFolderIsNotExist((process.env.TEMP_DIR = 'tmp'));
+      await createFolderIsNotExist(dirNames.TEMP_DIR);
+      await createFolderIsNotExist(dirNames.PUBLIC_DIR);
+      await createFolderIsNotExist(avatarsDir);
+
       console.log(`Server running. Use our API on port: ${PORT}`);
     });
   })

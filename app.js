@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const authRouter = require('./routes/api/users');
 const contactsRouter = require('./routes/api/contacts');
+const { dirNames } = require('./variables');
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use(cors());
 // Middleware for parsing JSON request bodies
 app.use(express.json());
 
-app.use(express.static('public'));
+app.use(express.static(dirNames.PUBLIC_DIR));
 
 // Routes for user authentication and contact management
 app.use('/api/users', authRouter);
