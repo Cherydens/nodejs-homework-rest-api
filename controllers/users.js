@@ -206,5 +206,3 @@ module.exports = {
   updateSubscriptionUser,
   updateUserAvatar,
 };
-
-// This code defines a set of controller functions for user registration, login, logout, retrieving the current user's information, and updating the user's subscription status. These functions are wrapped in error handling logic, and they interact with the User model and use JWT for authentication. In case of errors, appropriate HTTP status codes and error messages are returned in the responses.

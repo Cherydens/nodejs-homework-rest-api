@@ -40,20 +40,3 @@ describe('Tests for the Login Controller (login/signin)', () => {
     expect(typeof user.subscription).toBe('string');
   });
 });
-
-// This code contains a series of tests for the Login Controller in an Express application. Here's the documentation for each part of the code:
-
-// request, app, mongoServer, and the environment variables are imported for testing purposes.
-
-// The login credentials (email and password) are defined in the body object.
-
-// The describe block is used to group and label the tests related to the Login Controller.
-
-// The beforeAll and afterAll hooks are used to set up and tear down the MongoDB connection before and after running the tests, ensuring a clean test environment.
-
-// Three test cases are defined using test:
-
-// The first test checks that the response from the login endpoint has a status code of 200.
-// The second test verifies that a token is returned in the response.
-// The third test checks that the response contains a user object with email and subscription fields, both of which are of data type String.
-// These tests help ensure that the Login Controller functions correctly and returns the expected results when users log in to the application.

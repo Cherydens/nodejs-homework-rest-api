@@ -22,5 +22,3 @@ const validateBody = (schema) => {
 };
 
 module.exports = validateBody;
-
-// This middleware function is used for validating the request body using a Joi schema. It checks the request body against the provided schema and sends a 400 Bad Request response with the validation error message if the validation fails. If validation succeeds, it allows the request to continue to the next middleware or route handler.

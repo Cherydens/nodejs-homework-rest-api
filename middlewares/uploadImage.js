@@ -35,20 +35,3 @@ const uploadImage = multer({
 });
 
 module.exports = uploadImage;
-
-// This code documents the configuration of a Multer middleware for uploading images. Here's the breakdown of the documentation:
-
-// The code sets up Multer to handle file uploads, specifically for images.
-
-// The TEMP_DIR constant defines the path to the temporary directory where uploaded files will be stored before processing.
-
-// The multerConfig object configures Multer's storage settings, specifying the destination directory for uploaded files and naming each file with its original name.
-
-// The uploadImage Multer middleware instance is created with the following configurations:
-
-// storage: Uses the multerConfig settings for file storage.
-// limits: Specifies a file size limit of 2MB for uploaded images.
-// fileFilter: Defines a filter function to check if the uploaded file is an image based on its MIME type. If the file is not an image, it rejects it with a 400 Bad Request error.
-// Finally, the uploadImage middleware is exported for use in other parts of the application.
-
-// This documentation explains the purpose and configuration of the Multer middleware for image uploads in your code.

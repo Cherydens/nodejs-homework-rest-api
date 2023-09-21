@@ -1,7 +1,7 @@
 const Jimp = require('jimp');
 
 /**
- * Resize and crop an image using Jimp library.
+ * The function reads an image from the provided path, auto-crops it, resizes it to a size of 250x250 pixels while centering the content, and then writes the resized and cropped image back to the same path.
  *
  * @param {string} tempImage - The path to the temporary image file to be resized and cropped.
  * @returns {Promise<void>} A promise that resolves once the image has been resized and cropped.
@@ -16,5 +16,3 @@ const imageResizer = async (tempImage) => {
 };
 
 module.exports = imageResizer;
-
-// The function reads an image from the provided path, auto-crops it, resizes it to a size of 250x250 pixels while centering the content, and then writes the resized and cropped image back to the same path.

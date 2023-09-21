@@ -21,5 +21,3 @@ const isValidId = (req, res, next) => {
 };
 
 module.exports = isValidId;
-
-// This middleware function is used to validate whether a given ID is a valid MongoDB ObjectId. It checks if the provided ID is valid and sends a 400 Bad Request response with an error message if the validation fails. If the ID is valid, it allows the request to continue to the next middleware or route handler.

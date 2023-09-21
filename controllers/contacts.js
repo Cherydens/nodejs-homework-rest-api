@@ -178,5 +178,3 @@ module.exports = {
   updateStatusContact,
   removeContact,
 };
-
-// This JavaScript code defines a set of controller functions for managing contacts, including listing contacts, getting a contact by ID, adding, updating, updating the status, and removing a contact. These functions are wrapped in error handling logic, and they interact with the Contact model. In case of errors, appropriate HTTP status codes and error messages are returned in the responses.

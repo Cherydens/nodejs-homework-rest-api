@@ -48,5 +48,3 @@ const authenticate = async (req, res, next) => {
 };
 
 module.exports = authenticate;
-
-// This middleware function is used for user authentication using JSON Web Tokens (JWT). It checks the authorization header of incoming requests for a valid JWT token, verifies it, and ensures that the user associated with the token exists and matches the token stored in the database. If authentication fails, it sends a 401 Unauthorized response. If authentication succeeds, it sets the authenticated user in the request object (req.user) and allows the request to continue to the next middleware or route handler.

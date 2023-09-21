@@ -44,7 +44,3 @@ userSchema.post('save', handleMongooseError);
 const User = model('user', userSchema);
 
 module.exports = User;
-
-// This code defines a Mongoose schema for the User model, specifying the schema fields, data types, and validation rules. It also includes a post middleware to handle Mongoose save errors using the handleMongooseError function from the helpers module.
-
-// The User model is created using the model function, and it is exported for use in other parts of your application. This model represents the "user" collection in your MongoDB database and can be used to interact with user data.

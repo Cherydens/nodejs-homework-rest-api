@@ -51,7 +51,4 @@ router.patch(
   controllers.updateUserAvatar
 );
 
-//  The router object is exported for use in other parts of the program:
 module.exports = router;
-
-// This code creates an API for user registration, login, logout, retrieving the current user's information, updating the user's subscription status and updating the user's avatar. Middlewares like authenticate are used for user authentication, and validation schemas ensure that the request data is correct. Controllers handle the logic for these user-related operations.
