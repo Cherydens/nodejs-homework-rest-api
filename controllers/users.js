@@ -29,8 +29,8 @@ const registerUser = controllerWrapper(async (req, res) => {
   // Hash the provided password
   const hashPassword = await bcrypt.hash(password, 10);
 
-  // Create random avatar
-  const avatarURL = gravatar.url(email);
+  // Create avatarURL fro gravatar
+  const avatarURL = gravatar.url(email, { s: '250' }, true);
 
   // Create a new user with the hashed password
   const newUser = await User.create({
@@ -159,13 +159,19 @@ const updateSubscriptionUser = controllerWrapper(async (req, res) => {
  * @returns {Object} JSON response containing the updated user avatarURL
  */
 const updateUserAvatar = controllerWrapper(async (req, res) => {
+  // Check if an avatar file is provided in the request
   if (!req.file) {
     throw new HttpError(400, 'Avatar file is required');
   }
 
+  // Extract necessary data from the uploaded file
   const { path: tempUpload, originalname } = req.file;
   const { _id } = req.user;
+
+  // Generate a unique filename for the user's avatar
   const filename = `${_id}_${originalname}`;
+
+  // Define the destination path for the uploaded avatar
   const resultUpload = path.join(
     __dirname,
     '..',
@@ -173,10 +179,17 @@ const updateUserAvatar = controllerWrapper(async (req, res) => {
     dirNames.AVATARS_DIR,
     filename
   );
+
+  // Construct the avatarURL for the user
   const avatarURL = path.join(dirNames.AVATARS_DIR, filename);
 
+  // Resize the uploaded image
   await imageResizer(tempUpload);
+
+  // Move the uploaded file to its final destination
   await fs.rename(tempUpload, resultUpload);
+
+  // Update the user's avatarURL in the database
   await User.findByIdAndUpdate(_id, { avatarURL });
 
   // Respond with the updated user avatarURL

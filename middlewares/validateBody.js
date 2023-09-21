@@ -13,7 +13,6 @@ const validateBody = (schema) => {
 
     // If validation fails, send a 400 Bad Request response with the validation error message
     if (error) {
-      console.log(error.details[0]);
       next(new HttpError(400, error.details[0].message));
     }
 
