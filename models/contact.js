@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const { handleMongooseError } = require('../helpers');
+const { handleMongooseError } = require('../utils');
 const { regexpList } = require('../variables');
 
 /**
@@ -42,7 +42,3 @@ contactSchema.post('save', handleMongooseError);
 const Contact = model('contact', contactSchema);
 
 module.exports = Contact;
-
-// This code defines a Mongoose schema for the Contact model, specifying the schema fields, data types, and validation rules. It also includes a post middleware to handle Mongoose save errors using the handleMongooseError function from the helpers module.
-
-// The Contact model is created using the model function, and it is exported for use in other parts of your application. This model represents the "contact" collection in your MongoDB database and can be used to interact with contact data.

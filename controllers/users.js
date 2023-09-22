@@ -1,8 +1,12 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
+const path = require('path');
+const fs = require('fs/promises');
 
 const User = require('../models/user');
-const { HttpError, controllerWrapper } = require('../helpers');
+const { HttpError, controllerWrapper, imageResizer } = require('../utils');
+const { dirNames } = require('../variables');
 
 const { SECRET_KEY } = process.env;
 
@@ -25,14 +29,22 @@ const registerUser = controllerWrapper(async (req, res) => {
   // Hash the provided password
   const hashPassword = await bcrypt.hash(password, 10);
 
+  // Create avatarURL fro gravatar
+  const avatarURL = gravatar.url(email, { s: '250' }, true);
+
   // Create a new user with the hashed password
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
 
   // Respond with the newly registered user's email and subscription
   res.status(201).json({
     user: {
       email: newUser.email,
       subscription: newUser.subscription,
+      avatarURL: newUser.avatarURL,
     },
   });
 });
@@ -81,6 +93,7 @@ const loginUser = controllerWrapper(async (req, res) => {
     user: {
       email: user.email,
       subscription: user.subscription,
+      avatarURL: user.avatarURL,
     },
   });
 });
@@ -138,12 +151,58 @@ const updateSubscriptionUser = controllerWrapper(async (req, res) => {
   res.status(200).json(result);
 });
 
+/**
+ * Updates the avatar of the currently authenticated user.
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response containing the updated user avatarURL
+ */
+const updateUserAvatar = controllerWrapper(async (req, res) => {
+  // Check if an avatar file is provided in the request
+  if (!req.file) {
+    throw new HttpError(400, 'Avatar file is required');
+  }
+
+  // Extract necessary data from the uploaded file
+  const { path: tempUpload, originalname } = req.file;
+  const { _id } = req.user;
+
+  // Generate a unique filename for the user's avatar
+  const filename = `${_id}_${originalname}`;
+
+  // Define the destination path for the uploaded avatar
+  const resultUpload = path.join(
+    __dirname,
+    '..',
+    dirNames.PUBLIC_DIR,
+    dirNames.AVATARS_DIR,
+    filename
+  );
+
+  // Construct the avatarURL for the user
+  const avatarURL = path.join(dirNames.AVATARS_DIR, filename);
+
+  // Resize the uploaded image
+  await imageResizer(tempUpload);
+
+  // Move the uploaded file to its final destination
+  await fs.rename(tempUpload, resultUpload);
+
+  // Update the user's avatarURL in the database
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  // Respond with the updated user avatarURL
+  res.json({
+    avatarURL,
+  });
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser,
   updateSubscriptionUser,
+  updateUserAvatar,
 };
-
-// This code defines a set of controller functions for user registration, login, logout, retrieving the current user's information, and updating the user's subscription status. These functions are wrapped in error handling logic, and they interact with the User model and use JWT for authentication. In case of errors, appropriate HTTP status codes and error messages are returned in the responses.

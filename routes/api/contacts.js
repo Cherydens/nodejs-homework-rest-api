@@ -3,7 +3,7 @@ const express = require('express');
 
 const { validateBody, isValidId, authenticate } = require('../../middlewares');
 const controllers = require('../../controllers/contacts');
-const schemas = require('../../utils/validation/contactValidationSchemas');
+const { contactValidationSchemas } = require('../../utils');
 
 // An Express router object is created:
 const router = express.Router();
@@ -20,7 +20,7 @@ router.get('/:contactId', authenticate, isValidId, controllers.getContactById);
 router.post(
   '/',
   authenticate,
-  validateBody(schemas.addContactSchema),
+  validateBody(contactValidationSchemas.addContactSchema),
   controllers.addContact
 );
 
@@ -29,7 +29,7 @@ router.put(
   '/:contactId',
   authenticate,
   isValidId,
-  validateBody(schemas.updateContactSchema),
+  validateBody(contactValidationSchemas.updateContactSchema),
   controllers.updateContact
 );
 
@@ -38,7 +38,7 @@ router.patch(
   '/:contactId/favorite',
   authenticate,
   isValidId,
-  validateBody(schemas.updateStatusContactSchema),
+  validateBody(contactValidationSchemas.updateStatusContactSchema),
   controllers.updateStatusContact
 );
 
@@ -50,7 +50,4 @@ router.delete(
   controllers.removeContact
 );
 
-//  The router object is exported for use in other parts of the program:
 module.exports = router;
-
-// This code creates an API for managing contacts, where different requests are handled by respective middlewares and controllers. Middlewares like authenticate and isValidId are used for user authentication and data validation, while validation schemas ensure that the request data is correct. Controllers are responsible for handling requests and interacting with the database or other data sources.

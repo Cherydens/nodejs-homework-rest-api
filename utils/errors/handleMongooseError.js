@@ -16,7 +16,3 @@ const handleMongooseError = (error, data, next) => {
 };
 
 module.exports = handleMongooseError;
-
-// This middleware function, handleMongooseError, is used to handle Mongoose database errors that may occur during database operations. It checks the error type and code and sets an appropriate HTTP status code based on the error type. If the error is a MongoDB duplicate key error (error code 11000), it sets the status code to 409 (Conflict). For other types of errors, it sets the status code to 400 (Bad Request).
-
-// This middleware allows you to handle common Mongoose database errors and respond with appropriate HTTP status codes in your Express application.

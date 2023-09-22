@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const authRouter = require('./routes/api/users');
 const contactsRouter = require('./routes/api/contacts');
+const { dirNames } = require('./variables');
 
 const app = express();
 
@@ -20,6 +21,8 @@ app.use(cors());
 
 // Middleware for parsing JSON request bodies
 app.use(express.json());
+
+app.use(express.static(dirNames.PUBLIC_DIR));
 
 // Routes for user authentication and contact management
 app.use('/api/users', authRouter);
@@ -37,19 +40,3 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
-
-// This code sets up an Express application with various middleware and routes:
-
-// It configures the application to use different logging formats based on the environment (development or production).
-
-// It enables CORS using the cors middleware, allowing cross-origin requests.
-
-// It adds middleware for parsing JSON request bodies using express.json().
-
-// It sets up two routes for user authentication (/api/users) and contact management (/api/contacts) using the respective routers.
-
-// It defines middleware to handle 404 errors, responding with a "Not Found" message // for routes that do not match any defined routes.
-
-// It defines error-handling middleware to handle and send appropriate responses for // server errors, including setting the HTTP status code based on the error's status // and sending an error message.
-
-// This Express application can be used as a foundation for building a RESTful API that manages user authentication and contacts.
