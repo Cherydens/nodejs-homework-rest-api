@@ -3,9 +3,16 @@ const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const path = require('path');
 const fs = require('fs/promises');
+const { nanoid } = require('nanoid');
 
 const User = require('../models/user');
-const { HttpError, controllerWrapper, imageResizer } = require('../utils');
+const {
+  HttpError,
+  controllerWrapper,
+  imageResizer,
+  sendEmail,
+  createVerificationEmail,
+} = require('../utils');
 const { dirNames } = require('../variables');
 
 const { SECRET_KEY } = process.env;
@@ -32,12 +39,19 @@ const registerUser = controllerWrapper(async (req, res) => {
   // Create avatarURL fro gravatar
   const avatarURL = gravatar.url(email, { s: '250' }, true);
 
+  // Create random verification token
+  const verificationToken = nanoid();
+
   // Create a new user with the hashed password
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    verificationToken,
   });
+
+  // Send verification email
+  await sendEmail(createVerificationEmail({ email, verificationToken }));
 
   // Respond with the newly registered user's email and subscription
   res.status(201).json({
@@ -47,6 +61,45 @@ const registerUser = controllerWrapper(async (req, res) => {
       avatarURL: newUser.avatarURL,
     },
   });
+});
+
+/**
+ * Verify new user's email with the provided verification token.
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @throws {HttpError} 404 if user with verification token not found
+ * @returns {Object} JSON response containing the message 'Verification successful'
+ */
+const verifyUserEmail = controllerWrapper(async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    throw new HttpError(404, 'User not found');
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: null,
+  });
+  res.status(200).json({ message: 'Verification successful' });
+});
+
+const resendVerifyUserEmail = controllerWrapper(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new HttpError(404, 'Email not found');
+  }
+  if (user.verify) {
+    throw new HttpError(400, 'Verification has already been passed');
+  }
+
+  const { verificationToken } = user;
+
+  await sendEmail(createVerificationEmail({ email, verificationToken }));
+
+  res.status(200).json({ message: 'Verification email sent' });
 });
 
 /**
@@ -66,6 +119,10 @@ const loginUser = controllerWrapper(async (req, res) => {
   // If the user doesn't exist, respond with a 401 error
   if (!user) {
     throw new HttpError(401, 'Email or password is wrong');
+  }
+
+  if (!user.verify) {
+    throw new HttpError(401, 'Email is not verified');
   }
 
   // Compare the provided password with the hashed password in the database
@@ -200,6 +257,8 @@ const updateUserAvatar = controllerWrapper(async (req, res) => {
 
 module.exports = {
   registerUser,
+  verifyUserEmail,
+  resendVerifyUserEmail,
   loginUser,
   logoutUser,
   getCurrentUser,

@@ -22,6 +22,16 @@ router.post(
   controllers.registerUser
 );
 
+// Route for verification user's email (GET /verify/:verificationToken):
+router.get('/verify/:verificationToken', controllers.verifyUserEmail);
+
+// Route for resend verification user's email (POST /verify):
+router.post(
+  '/verify',
+  validateBody(userValidationSchemas.verifyUserEmailSchema),
+  controllers.resendVerifyUserEmail
+);
+
 // Route for user login (POST /login):
 router.post(
   '/login',

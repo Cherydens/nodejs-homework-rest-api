@@ -17,6 +17,10 @@ const registerUserSchema = Joi.object({
     .default(subscriptionList[0]),
 }).messages(validateErrorMessageList);
 
+const verifyUserEmailSchema = Joi.object({
+  email: registerUserSchema.extract('email'),
+}).messages(validateErrorMessageList);
+
 /**
  * Joi schema for validating the request body when logging in a user.
  */
@@ -34,6 +38,7 @@ const updateSubscriptionUserSchema = Joi.object({
 
 module.exports = {
   registerUserSchema,
+  verifyUserEmailSchema,
   loginUserSchema,
   updateSubscriptionUserSchema,
 };
