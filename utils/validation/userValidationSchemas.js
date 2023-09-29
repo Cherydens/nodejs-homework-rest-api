@@ -17,6 +17,9 @@ const registerUserSchema = Joi.object({
     .default(subscriptionList[0]),
 }).messages(validateErrorMessageList);
 
+/**
+ * Joi schema for validating the request body when verifying user's email.
+ */
 const verifyUserEmailSchema = Joi.object({
   email: registerUserSchema.extract('email'),
 }).messages(validateErrorMessageList);

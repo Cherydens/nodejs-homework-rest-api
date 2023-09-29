@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const path = require('path');
@@ -190,10 +190,10 @@ const logoutUser = controllerWrapper(async (req, res) => {
  * @returns {Object} JSON response containing the user's email and subscription
  */
 const getCurrentUser = controllerWrapper(async (req, res) => {
-  const { email, subscription } = req.user;
+  const { email, subscription, avatarURL } = req.user;
 
   // Respond with the user's email and subscription
-  res.status(200).json({ email, subscription });
+  res.status(200).json({ email, subscription, avatarURL });
 });
 
 /**
