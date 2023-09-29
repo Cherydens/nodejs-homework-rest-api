@@ -84,6 +84,15 @@ const verifyUserEmail = controllerWrapper(async (req, res) => {
   res.status(200).json({ message: 'Verification successful' });
 });
 
+/**
+ * Resend Email to the User with a Verification Link.
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @throws {HttpError} 404 if user with verification email not found
+ * @throws {HttpError} 400 if verification has already been passed
+ * @returns {Object} JSON response containing the message 'Verification email sent'
+ */
 const resendVerifyUserEmail = controllerWrapper(async (req, res) => {
   const { email } = req.body;
 
@@ -121,6 +130,7 @@ const loginUser = controllerWrapper(async (req, res) => {
     throw new HttpError(401, 'Email or password is wrong');
   }
 
+  // If user's email is not verified, respond with a 401 error
   if (!user.verify) {
     throw new HttpError(401, 'Email is not verified');
   }
